@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext.jsx';
 import logo from '../assets/logo.png';
@@ -18,6 +18,7 @@ const toolLinks = [
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout, updateUser } = useContext(AuthContext);
   
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -160,7 +161,7 @@ const Navbar = () => {
               onClick={() => {
                 const trial = { features: ['ai','revision'], startedAt: Date.now() };
                 localStorage.setItem('edumind_trial', JSON.stringify(trial));
-                window.location.href = '/ai';
+                navigate('/ai');
               }} 
               className="rounded-full bg-sage px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold text-slate-950 shadow-md transition duration-200 hover:bg-sage/85 hover:scale-103 whitespace-nowrap shrink-0"
             >
