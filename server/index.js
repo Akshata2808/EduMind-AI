@@ -20,7 +20,12 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    if (origin.startsWith('http://localhost:')) {
+    if (
+      origin.startsWith('http://localhost:') ||
+      origin.startsWith('http://127.0.0.1:') ||
+      origin === 'https://edumind-frontend.onrender.com' ||
+      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
+    ) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));
