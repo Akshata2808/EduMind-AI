@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthContext } from './context/AuthContext.jsx';
 import LandingPage from './pages/LandingPage.jsx';
@@ -36,6 +36,7 @@ function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<motion.div {...pageTransition}><LandingPage /></motion.div>} />
+          <Route path="/index.html" element={<Navigate to="/" replace />} />
           <Route path="/auth" element={<motion.div {...pageTransition}><AuthPage /></motion.div>} />
           <Route path="/reset-password/:token" element={<motion.div {...pageTransition}><ResetPasswordPage /></motion.div>} />
           <Route path="/dashboard" element={<ProtectedRoute><motion.div {...pageTransition}><DashboardPage /></motion.div></ProtectedRoute>} />
