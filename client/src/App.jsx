@@ -15,6 +15,7 @@ import RoadmapPage from './pages/RoadmapPage.jsx';
 import FlashcardsPage from './pages/FlashcardsPage.jsx';
 import ForumPage from './pages/ForumPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import Navbar from './components/Navbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -36,6 +37,7 @@ function App() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<motion.div {...pageTransition}><LandingPage /></motion.div>} />
           <Route path="/auth" element={<motion.div {...pageTransition}><AuthPage /></motion.div>} />
+          <Route path="/reset-password/:token" element={<motion.div {...pageTransition}><ResetPasswordPage /></motion.div>} />
           <Route path="/dashboard" element={<ProtectedRoute><motion.div {...pageTransition}><DashboardPage /></motion.div></ProtectedRoute>} />
           <Route path="/ai" element={<ProtectedRoute><motion.div {...pageTransition}><AIChatPage /></motion.div></ProtectedRoute>} />
           <Route path="/forum" element={<motion.div {...pageTransition}><ForumPage /></motion.div>} />

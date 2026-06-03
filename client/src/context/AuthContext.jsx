@@ -44,13 +44,20 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const loginWithGoogle = async (idToken) => {
+    const { data } = await api.post('/auth/google', { idToken });
+    localStorage.setItem('edumind_token', data.token);
+    setUser(data.user);
+    return data;
+  };
+
   const logout = () => {
     localStorage.removeItem('edumind_token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, updateUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateUser, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

@@ -16,6 +16,41 @@ const toolLinks = [
   { label: 'Maths Solver', to: '/maths' }
 ];
 
+const compressImage = (file, callback) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = (event) => {
+    const img = new Image();
+    img.src = event.target.result;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 250;
+      const MAX_HEIGHT = 250;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      callback(dataUrl);
+    };
+  };
+};
+
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -319,14 +354,33 @@ const Navbar = () => {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider block mb-1">🖼️ Profile Picture URL</label>
-                  <input
-                    type="text"
-                    value={editForm.avatar || ''}
-                    onChange={(e) => setEditForm({ ...editForm, avatar: e.target.value })}
-                    placeholder="e.g. https://api.dicebear.com/7.x/avataaars/svg?seed=user"
-                    className="w-full rounded-xl border border-sage/25 bg-offwhite px-4 py-2.5 text-xs text-slate-950 font-semibold outline-none focus:border-sage focus:ring-1 focus:ring-sage shadow-inner"
-                  />
+                  <label className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider block mb-1.5">🖼️ Profile Picture (Camera / Gallery)</label>
+                  <div className="flex flex-col items-center justify-center p-4 bg-offwhite border border-dashed border-sage/40 rounded-2xl relative">
+                    <div className="relative group cursor-pointer w-20 h-20 rounded-full overflow-hidden border-2 border-emerald-500/25 shadow-sm mb-2 flex items-center justify-center bg-white">
+                      {editForm.avatar ? (
+                        <img src={editForm.avatar} alt="Profile Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-3xl text-slate-300">👤</div>
+                      )}
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-[9px] font-bold transition duration-200">
+                        <span>Upload 📷</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            compressImage(file, (dataUrl) => {
+                              setEditForm({ ...editForm, avatar: dataUrl });
+                            });
+                          }
+                        }}
+                      />
+                    </div>
+                    <span className="text-[8px] font-semibold text-slate-400">Supports direct camera capture or photo gallery</span>
+                  </div>
                 </div>
 
                 {/* Actions */}
