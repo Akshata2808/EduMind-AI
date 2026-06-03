@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import api from '../api/axios.js';
 import AppleEmoji from '../components/AppleEmoji.jsx';
 
 const RoadmapPage = () => {
-  const [goal, setGoal] = useState('');
+    const [goal, setGoal] = useState('');
   const [branch, setBranch] = useState('Computer Engineering');
   const [semester, setSemester] = useState('Semester 5');
   const [result, setResult] = useState('');
@@ -118,6 +119,9 @@ const RoadmapPage = () => {
 
   return (
     <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12 overflow-hidden">
+      <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl bg-white/70 hover:bg-white border border-sage/20 px-3.5 py-1.5 text-xs font-bold text-slate-800 transition duration-200 shadow-sm hover:shadow hover:scale-102 mb-6 shrink-0 self-start">
+        ← Back to Dashboard
+      </Link>
       {/* Background ambient decorative glows */}
       <div className="absolute top-1/4 left-1/10 -z-10 h-72 w-72 rounded-full bg-palegreen/15 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/10 -z-10 h-96 w-96 rounded-full bg-mint/20 blur-[120px] pointer-events-none" />

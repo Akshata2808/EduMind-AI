@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import api from '../api/axios.js';
 import AppleEmoji from '../components/AppleEmoji.jsx';
 
 const MathsSolverPage = () => {
-  const [problem, setProblem] = useState('');
+    const [problem, setProblem] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -100,6 +101,9 @@ const MathsSolverPage = () => {
 
   return (
     <main className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-12 overflow-hidden">
+      <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl bg-white/70 hover:bg-white border border-sage/20 px-3.5 py-1.5 text-xs font-bold text-slate-800 transition duration-200 shadow-sm hover:shadow hover:scale-102 mb-6 shrink-0 self-start">
+        ← Back to Dashboard
+      </Link>
       {/* Background ambient HSL glows */}
       <div className="absolute top-1/4 left-1/10 -z-10 h-72 w-72 rounded-full bg-palegreen/10 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/10 -z-10 h-96 w-96 rounded-full bg-mint/15 blur-[120px] pointer-events-none" />

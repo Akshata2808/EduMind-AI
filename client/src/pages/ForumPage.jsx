@@ -44,7 +44,7 @@ const onlineStories = [
 
 const ForumPage = () => {
   const { user } = useContext(AuthContext);
-  const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -831,6 +831,11 @@ const ForumPage = () => {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 md:px-6 bg-offwhite min-h-screen">
       <div className="space-y-6">
+        {/* Back to Dashboard Button */}
+        <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-xl bg-white/70 hover:bg-white border border-sage/20 px-3.5 py-1.5 text-xs font-bold text-slate-800 transition duration-200 shadow-sm hover:shadow hover:scale-102 mb-2 shrink-0 self-start">
+          ← Back to Dashboard
+        </Link>
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
