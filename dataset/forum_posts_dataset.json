@@ -1,0 +1,89 @@
+[
+  {
+    "title": "Full Hand-Written Lecture Notes on Neural Networks Backpropagation",
+    "content": "Just finished summarizing the complete chain-rule derivation for feedforward networks. Uploading these simplified formulas and gradients. Hope it makes the backprop calculus click for everyone before the midterm next Thursday! Let me know if you need the PDF version.",
+    "category": "Project Help",
+    "authorName": "Rohan Gupta",
+    "authorRole": "CS Sophomore",
+    "avatar": "RG",
+    "likes": 42,
+    "bookmarks": 18,
+    "hashtags": ["NeuralNetworks", "DeepLearning", "LectureNotes", "ML_Math"],
+    "replies": [
+      {
+        "authorName": "Prof. Sneha",
+        "content": "This is a remarkably clean derivation, Rohan! I recommend my Applied Math class check out your section on partial derivative tracking. Well done.",
+        "createdAt": "2026-05-22T08:30:00.000Z"
+      },
+      {
+        "authorName": "Sarah",
+        "content": "Lifesaver! The textbook diagram was so cluttered. Your color-coded weights make so much more sense.",
+        "createdAt": "2026-05-22T09:12:00.000Z"
+      }
+    ]
+  },
+  {
+    "title": "Varying Scheduler Final Exam Tips & Hidden Topics 🚨",
+    "content": "Heard from the TA that this year's Operating Systems exam will place massive weight on Multi-Level Feedback Queue (MLFQ) starvation edge cases. Make sure you review the priority boost interval calculation formulas. Don't skip the priority decay diagrams on slide 14!",
+    "category": "Exam Prep",
+    "authorName": "Dev Patel",
+    "authorRole": "Computer Systems Junior",
+    "avatar": "DP",
+    "likes": 65,
+    "bookmarks": 29,
+    "hashtags": ["OS_Exams", "MLFQ", "FinalsPrep", "Scheduling"],
+    "replies": [
+      {
+        "authorName": "Priya",
+        "content": "Wait, is priority boost done periodically or after a fixed execution interval? My notes say every 100ms.",
+        "createdAt": "2026-05-22T10:15:00.000Z"
+      },
+      {
+        "authorName": "Dev Patel",
+        "content": "Priya, yes! 100ms is standard, but the exam might ask how priority behaves if processes enter the queue asynchronously.",
+        "createdAt": "2026-05-22T10:45:00.000Z"
+      }
+    ]
+  },
+  {
+    "title": "Best YouTube Lectures/Playlists for Linear Algebra Visualizations?",
+    "content": "Struggling to build an intuitive, geometric understanding of eigenvalues and vector transformation spaces. Is 3Blue1Brown still the absolute gold standard or are there other channels you'd suggest for advanced engineering math syllabus?",
+    "category": "General Talk",
+    "authorName": "Aarav Sharma",
+    "authorRole": "First Year Engineering Student",
+    "avatar": "AS",
+    "likes": 28,
+    "bookmarks": 7,
+    "hashtags": ["LinearAlgebra", "MathInSight", "Eigenthings", "LectureVideos"],
+    "replies": [
+      {
+        "authorName": "Dr. Roy",
+        "content": "Gilbert Strang's MIT OpenCourseWare lectures are exceptional for rigorous proofs. Use 3Blue1Brown for intuition, and Strang for solving systems.",
+        "createdAt": "2026-05-22T11:20:00.000Z"
+      },
+      {
+        "authorName": "Aarav Sharma",
+        "content": "Thank you, Professor! I'll match those playlists together for my study checklist.",
+        "createdAt": "2026-05-22T12:05:00.000Z"
+      }
+    ]
+  },
+  {
+    "title": "Interactive Study Session: Designing a Smart Attendance Tracker Database Schema",
+    "content": "Working on a side project to model student academic attendance compliance across different grading policies. Here is a snippet of my SQL DDL schema. Would love to get some feedback on how to handle lecture rescheduling edge-cases efficiently.",
+    "category": "Study Groups",
+    "authorName": "Sarah Jenkins",
+    "authorRole": "Electrical & Systems Senior",
+    "avatar": "SJ",
+    "likes": 34,
+    "bookmarks": 12,
+    "hashtags": ["DatabaseDesign", "SQL_Schemas", "SideProjects", "DevFlow"],
+    "replies": [
+      {
+        "authorName": "Rohan Gupta",
+        "content": "You might want to add a junction table for 'RescheduledLectures' mapping the original session ID to the new date, to preserve historical metrics.",
+        "createdAt": "2026-05-22T12:40:00.000Z"
+      }
+    ]
+  }
+]

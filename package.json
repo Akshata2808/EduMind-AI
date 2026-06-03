@@ -1,0 +1,19 @@
+{
+  "name": "edumind-ai",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "install-all": "npm install --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "caniuse-lite": "^1.0.30001793",
+    "lodash": "^4.17.21"
+  }
+}

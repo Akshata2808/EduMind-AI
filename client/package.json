@@ -1,0 +1,30 @@
+{
+  "name": "edumind-ai-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node copy-image.js && vite",
+    "build": "node copy-image.js && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.0.18",
+    "@lottiefiles/dotlottie-react": "^0.19.4",
+    "axios": "^1.6.6",
+    "framer-motion": "^11.0.0",
+    "lodash": "^4.17.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.16.0",
+    "recharts": "^2.9.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.5",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.4",
+    "vite": "^5.4.1"
+  }
+}

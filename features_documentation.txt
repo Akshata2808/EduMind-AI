@@ -1,0 +1,424 @@
+================================================================================
+EDUMIND AI - TECHNICAL & PRODUCT DOCUMENTATION
+================================================================================
+
+This document contains a comprehensive breakdown of all features in the EduMind AI
+platform. It explains their user interaction flow (UX), front-end files and state 
+handling, API endpoints, Mongoose database models, and the backend business logic
+(including AI prompting where applicable).
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1. System Architecture Overview
+2. Core Database Models (MongoDB/Mongoose)
+3. Detailed Feature Breakdown
+   3.1.  AI Study Chat
+   3.2.  Revision Coach
+   3.3.  Career Roadmap Generator
+   3.4.  Flashcards Maker
+   3.5.  Voice Assistant
+   3.6.  PDF Smart Summarizer
+   3.7.  Practice Quizzes
+   3.8.  Attendance Tracker
+   3.9.  Study Planner
+   3.1.0. Progress Analytics
+   3.1.1. Community Forum
+4. How Students Interact (Unified UX Flow)
+5. Local Setup & Troubleshooting Guide
+
+================================================================================
+1. SYSTEM ARCHITECTURE OVERVIEW
+================================================================================
+EduMind AI is a full-stack, single-repository (monorepo) application built with:
+- Frontend: React (v18) built via Vite, styled using Tailwind CSS and Framer Motion 
+  for premium animations. State is managed locally with React Hooks and context.
+- Backend: Node.js with Express, handling file parsing (PDFs), AI queries, and routing.
+- Database: MongoDB via Mongoose, storing users, attendance records, study tasks,
+  viva prep results, quiz sessions, and forum discussions.
+- AI Layer: Gemini API integration via a client helper for natural language chat,
+  summaries, flashcard generation, and roadmap pathfinding.
+
+================================================================================
+2. CORE DATABASE MODELS (MONGODB/MONGOOSE)
+================================================================================
+
+The database consists of 7 mongoose schemas defined in 'server/models/':
+
+1. User.js:
+   - Schema:
+     name: String (required, trimmed)
+     email: String (required, unique, lowercase, trimmed)
+     password: String (required, bcrypt hashed)
+     college: String (default: '')
+     branch: String (default: '')
+     semester: String (default: '')
+     role: String ('student' or 'admin', default: 'student')
+     avatar: String (avatar image file path or URL)
+     createdAt: Date (default: Date.now)
+
+2. Note.js (for PDF summaries):
+   - Schema:
+     user: ObjectId (ref: 'User', required: true)
+     title: String (default: 'Untitled upload')
+     summary: String (default: '')
+     highlights: [String] (array of key takeaways)
+     questions: [String] (array of viva prep questions)
+     fileName: String
+     createdAt: Date (default: Date.now)
+
+3. Quiz.js:
+   - Schema:
+     user: ObjectId (ref: 'User', required: true)
+     topic: String (required: true)
+     questions: [
+       question: String,
+       options: [String],
+       answer: String
+     ]
+     score: Number (default: 0)
+     createdAt: Date (default: Date.now)
+
+4. Task.js (for Planner):
+   - Schema:
+     user: ObjectId (ref: 'User', required: true)
+     title: String (required)
+     dueDate: String (stored as string date representation)
+     completed: Boolean (default: false)
+     createdAt: Date (default: Date.now)
+
+5. Attendance.js:
+   - Schema:
+     user: ObjectId (ref: 'User', required: true, unique: true)
+     totalLectures: Number (default: 0)
+     attended: Number (default: 0)
+     skipEstimate: Number (default: 0)
+     predicted: Number (default: 0)
+     warning: String (alert message text)
+     updatedAt: Date (default: Date.now)
+
+6. Memory.js (for storing student weak areas & custom context):
+   - Schema:
+     user: ObjectId (ref: 'User', required: true)
+     weakSubjects: [String] (subjects the student struggles with)
+     doubts: [
+       question: String,
+       answer: String,
+       createdAt: Date
+     ]
+     studyPatterns: Mixed (JSON blob tracking active times)
+     attendanceTrends: Mixed
+     createdAt: Date (default: Date.now)
+     updatedAt: Date (default: Date.now)
+
+7. ForumPost.js (Community Discussions):
+   - Schema:
+     title: String (required)
+     content: String (required)
+     category: String (default: 'General Talk')
+     authorName: String (default: 'Guest Student')
+     authorRole: String (default: 'Student')
+     avatar: String (URL)
+     likes: Number (default: 0)
+     likedBy: [String] (user emails or IDs who liked)
+     bookmarks: Number (default: 0)
+     bookmarkedBy: [String] (user IDs)
+     hashtags: [String]
+     replies: [
+       authorName: String,
+       authorRole: String,
+       avatar: String,
+       content: String,
+       createdAt: Date
+     ]
+     createdAt: Date (default: Date.now)
+
+================================================================================
+3. DETAILED FEATURE BREAKDOWN
+================================================================================
+
+--------------------------------------------------------------------------------
+3.1. AI STUDY CHAT
+--------------------------------------------------------------------------------
+* Description:
+  An interactive study companion allowing students to type queries, get instant
+  coding help, explain syllabus modules, and parse queries in two separate contexts:
+  Standard Mode or Mumbai University Syllabus Mode.
+* Student Flow:
+  1. Student enters AIChatPage.
+  2. Toggles mode (Standard vs Mumbai Syllabus).
+  3. Types a query or clicks on one of the quick suggestions ("OS Syllabus", "React useEffect").
+  4. The DotLottie robot mascot reads the query and displays a loading bounce while thinking.
+  5. The assistant returns a styled, list-friendly explanation.
+* Frontend Logic (client/src/pages/AIChatPage.jsx):
+  - State variables:
+    * `mode`: 'standard' or 'mumbai' (toggled by switcher pill)
+    * `message`: string text in prompt input box
+    * `history`: array of message objects `{ role: 'user'|'assistant', text: String }`
+    * `loading`: Boolean state controlling spinner and mascot thinking overlay
+  - UI Elements:
+    * Left companion card loaded with `DotLottieReact` running a book-reading robot animation.
+    * Dynamically generated speech bubbles based on chat states (`getMascotSpeech` helper).
+    * Segemented button switcher with aligned button sizes.
+* API Endpoints:
+  - `POST /api/ai/chat`
+    * Payload: `{ message: String, mode: 'standard'|'mumbai' }`
+    * Headers: `Authorization: Bearer <token>` (Optional)
+    * Response: `{ answer: String }`
+* Backend Logic:
+  - Inside `server/routes/ai.js`, the `/chat` route defines the context prompt:
+    * Standard Mode: "Explain clearly for an engineering student."
+    * Mumbai Mode: "Explain like a Mumbai engineering student, friendly and practical."
+  - It appends user input to the selected system prompt and sends it to the Gemini client API.
+
+--------------------------------------------------------------------------------
+3.2. REVISION COACH
+--------------------------------------------------------------------------------
+* Description:
+  Tailors custom revisions guidelines, chapter weights, and viva mock questions
+  for multiple subjects.
+* Student Flow:
+  1. Student inputs subjects (e.g. Maths, Data Structures) and selects an target exam date.
+  2. Clicks "Generate Plan".
+  3. Renders a comprehensive syllabus roadmap, marking priority topics, chapter weights,
+     and preview questions.
+* Frontend Logic (client/src/pages/RevisionPage.jsx):
+  - State variables:
+    * `subjects`: array of active subjects
+    * `examDate`: string exam date representation
+    * `result`: AI revision package output
+    * `loading`: Boolean loading spinner control
+* API Endpoints:
+  - `POST /api/ai/revision`
+    * Payload: `{ subjects: [String], examDate: String }`
+    * Response: `{ raw: String }` (JSON string returned from Gemini)
+* Backend Logic:
+  - Constructs an instruction prompt:
+    "Identify important topics, generate quick revision notes, probable viva questions, and prioritize chapters by scoring. Provide JSON output with keys: topics, notes, questions, priorities."
+  - Uses `generateText(prompt)` to request JSON formatted content.
+  - If a user is logged in, it automatically parses the subjects list and stores them in the User's `Memory` document (`weakSubjects` array) using Mongoose `findOneAndUpdate` with `$addToSet`.
+
+--------------------------------------------------------------------------------
+3.3. CAREER ROADMAP GENERATOR
+--------------------------------------------------------------------------------
+* Description:
+  Creates structured, step-by-step learning roadmaps for technical careers based
+  on the student's branch, semester, and personal goals.
+* Student Flow:
+  1. Student fills out goal profile: Career target (e.g. "DevOps Engineer"), college branch, and current semester.
+  2. Generates a custom visual step-by-step track.
+  3. Displays skills to learn, suggested projects, and interview tips.
+* Frontend Logic (client/src/pages/RoadmapPage.jsx):
+  - Form states capturing `goal`, `branch`, and `semester`.
+  - Layout renders visual track connections with animated icons and progress marks.
+* API Endpoints:
+  - `POST /api/ai/roadmap`
+    * Payload: `{ goal: String, branch: String, semester: String }`
+    * Headers: `Authorization: Bearer <token>` (Required)
+    * Response: `{ raw: String }` (AI roadmap JSON block)
+* Backend Logic:
+  - Prompt: "Create a practical career roadmap for a student whose goal is: <goal>. Include required skills, suggested projects, timeline, and interview prep tips. Mention specifics for branch: <branch> and semester: <semester>."
+  - Returns structured path instructions containing lists of milestones.
+
+--------------------------------------------------------------------------------
+3.4. FLASHCARDS MAKER
+--------------------------------------------------------------------------------
+* Description:
+  Creates interactive front-and-back flip cards for review on various study topics.
+* Student Flow:
+  1. Types a topic name (e.g. "Compiler Design").
+  2. AI generates up to 10 question-and-answer pairs.
+  3. Student interacts by clicking to flip cards, checking answers, and navigating decks.
+* Frontend Logic (client/src/pages/FlashcardsPage.jsx):
+  - State: `cards` (array), `flipped` (Boolean status for active card), `index` (active card index).
+  - Uses CSS 3D Transforms (`perspective-1000`, `preserve-3d`, `backface-hidden`) for high-fidelity flip animations.
+* API Endpoints:
+  - `POST /api/ai/flashcards`
+    * Payload: `{ topic: String, count: Number }`
+    * Response: `{ raw: String }` (Text blocks split into Q: and A:)
+* Backend Logic:
+  - Prompt: "Generate <count> concise flashcards for the topic: <topic>. Output as numbered lines Q: <question> - A: <answer>."
+  - Backend parses this text block into structural lists and returns it.
+
+--------------------------------------------------------------------------------
+3.5. VOICE ASSISTANT
+--------------------------------------------------------------------------------
+* Description:
+  Hands-free audio workspace allowing students to ask questions verbally and
+  hear answers spoken aloud.
+* Student Flow:
+  1. Clicks the microphone icon to activate voice recording.
+  2. Speaks a question.
+  3. Browser Web Speech API records input, passes it to the AI chat backend.
+  4. The AI returns the response text, which is read aloud by the browser's Synthesis API.
+* Frontend Logic (client/src/pages/VoiceAssistantPage.jsx):
+  - Leverages browser APIs:
+    * `window.SpeechRecognition` (or `window.webkitSpeechRecognition`) to capture voice input.
+    * `window.speechSynthesis` and `SpeechSynthesisUtterance` to read responses aloud.
+  - Sits as a hands-free utility on top of the AI chat routes.
+
+--------------------------------------------------------------------------------
+3.6. PDF SMART SUMMARIZER
+================================================================================
+* Description:
+  Parses uploaded text PDFs and generates clean tabbed summaries, key takeaways,
+  and relevant questions to support students during study revision.
+* Student Flow:
+  1. Student enters PDFSummaryPage.
+  2. Configures Summary Format (Bullets vs Study Guide) and Curriculum Target (Mumbai MU vs Textbook).
+  3. Drags & drops a PDF or clicks to upload.
+  4. Triggers upload. A Lottie scanner starts and displays a glowing green laser line.
+  5. The server processes the file and saves the notes.
+  6. The interface opens three results tabs: "Summary", "Key Takeaways", and "Viva Prep".
+  7. Student can click "Copy Tab" to save contents to their clipboard instantly.
+* Frontend Logic (client/src/pages/PDFSummaryPage.jsx):
+  - State variables:
+    * `file`: active file object to upload
+    * `result`: Mongoose Note document containing summary, highlights, and questions
+    * `loading`: Boolean state managing the laser scan timeline and spinners
+    * `dragActive`: Boolean managing drag styling borders
+    * `activeTab`: 'summary' | 'highlights' | 'questions'
+    * `summaryLength`: 'bullet' | 'detailed'
+    * `focusArea`: 'exam' | 'general'
+  - UI Details:
+    * Displays Lottie Scanner (`DotLottieReact`) inside a glowing green gradient container.
+    * Integrates a visual stepper ("How it works") on the right.
+    * Preferences panel toggles options before triggering upload.
+* API Endpoints:
+  - `POST /api/ai/summarize`
+    * Request Type: `multipart/form-data`
+    * Payload: `file` (binary PDF file), `summaryLength`, `focusArea`
+    * Headers: `Authorization: Bearer <token>`
+    * Response: `{ note: NoteSchemaObject }`
+* Backend Logic (server/routes/ai.js):
+  - Integrates `multer` middle-ware to intercept file uploads.
+  - Uses `pdf-parse` library to extract raw text characters from the file buffer.
+  - Slices text length to 12,000 characters to optimize Gemini API tokens limits.
+  - Runs parallel calls to the Gemini client:
+    1. Summarize text.
+    2. Extract key points.
+    3. Generate viva questions.
+  - Creates a `Note` record in Mongoose.
+  - Deletes the temporary uploaded file from the server's local disk `uploads/` directory.
+
+--------------------------------------------------------------------------------
+3.7. PRACTICE QUIZZES
+--------------------------------------------------------------------------------
+* Description:
+  Generates automated MCQ questions to test student knowledge retention.
+* Student Flow:
+  1. Student inputs a subject/topic.
+  2. A 3-question MCQ quiz is generated.
+  3. Selects options and clicks "Submit Quiz".
+  4. Displays a review score indicating performance.
+* Frontend Logic (client/src/pages/QuizPage.jsx):
+  - Tracks answers state, scoring status, and renders styled green/red borders on review.
+* API Endpoints:
+  - `POST /api/quiz/generate`:
+    * Payload: `{ topic: String }`
+    * Response: `{ quiz: QuizObject }`
+  - `POST /api/quiz/submit`:
+    * Payload: `{ quizId: String, answers: { Question: AnswerString } }`
+    * Response: `{ score: Number, total: Number }`
+* Backend Logic:
+  - Generates questions on standard template logic.
+  - Calculates accuracy metrics, saves scoring status in Quiz database model.
+
+--------------------------------------------------------------------------------
+3.8. ATTENDANCE TRACKER
+--------------------------------------------------------------------------------
+* Description:
+  Predictive utility ensuring college attendance stays above thresholds.
+* Student Flow:
+  1. Inputs total lectures, attended lectures, and expected skip limit.
+  2. System calculates current rate and predicted attendance.
+  3. Displays warning alerts if score falls below 75% (standard university limit).
+* Frontend Logic (client/src/pages/AttendancePage.jsx):
+  - Captures numbers inputs and renders a visual progress dial (green for safe, red for warning).
+* API Endpoints:
+  - `GET /api/attendance`
+  - `POST /api/attendance/predict`:
+    * Payload: `{ totalLectures: Number, attended: Number, skipEstimate: Number }`
+    * Response: `{ current, predicted, warning, totalLectures, attended, skipEstimate }`
+* Backend Logic:
+  - Saves the prediction details in the Mongoose `Attendance` model.
+  - Formulates the alert warning label:
+    "Warning: Your attendance may fall below the safe threshold." if predicted < 75.
+
+--------------------------------------------------------------------------------
+3.9. STUDY PLANNER
+--------------------------------------------------------------------------------
+* Description:
+  A clean task-management and planning checklist.
+* Student Flow:
+  1. Student enters tasks and optional due dates.
+  2. Checks boxes to mark tasks complete.
+  3. Deletes expired items.
+* Frontend Logic (client/src/pages/PlannerPage.jsx):
+  - Manages list additions, completion updates, and filters completed items.
+* API Endpoints:
+  - `GET /api/planner`: Fetch tasks.
+  - `POST /api/planner`: Create task.
+  - `PATCH /api/planner/:id`: Update completion/title.
+  - `DELETE /api/planner/:id`: Delete task.
+* Backend Logic:
+  - Directly syncs changes with the Mongoose `Task` model.
+
+--------------------------------------------------------------------------------
+3.1.0. PROGRESS ANALYTICS
+--------------------------------------------------------------------------------
+* Description:
+  A dashboard visualizer rendering charts and stats of study metrics.
+* Student Flow:
+  1. Displays study time, exam performance records, and weekly progress charts.
+* Frontend Logic (client/src/pages/AnalyticsPage.jsx):
+  - Uses `recharts` package to render responsive area charts, bar graphs, and lines.
+* Backend Logic:
+  - Feeds quiz scores, attendance logs, and study task numbers to the frontend.
+
+--------------------------------------------------------------------------------
+3.1.1. COMMUNITY FORUM
+--------------------------------------------------------------------------------
+* Description:
+  A collaborative study space to share resources, ask doubts, and reply to posts.
+* Student Flow:
+  1. Students browse the post feed.
+  2. Filter posts by category (General Talk, Doubt Solving, Mumbai MU Syllabus).
+  3. Likes, bookmarks, or replies to posts.
+  4. Signed-in students can write new posts instantly.
+* Frontend Logic (client/src/pages/ForumPage.jsx & client/src/components/ForumSection.jsx):
+  - Custom card headers, horizontal divider modules, and badge highlights.
+  - Left panel shows dynamic upcoming events and rules cards to fill out layout heights.
+* API Endpoints:
+  - `GET /api/forum`: Fetches all discussions.
+  - `POST /api/forum`: Creates a post.
+  - `POST /api/forum/:id/reply`: Appends message to replies array.
+  - `POST /api/forum/:id/like` & `POST /api/forum/:id/bookmark`
+* Backend Logic:
+  - Directly stores discussions in Mongoose `ForumPost` schema.
+
+================================================================================
+4. HOW STUDENTS INTERACT (UNIFIED UX FLOW)
+================================================================================
+1. Landing Page Landing:
+   - Students visit the landing page, greeted by the cartoon study animation.
+   - Click "Try For Free Now" to activate guest mode (AI Chat and Revision Coach unlocked).
+2. Registration:
+   - To unlock the remaining 8+ features, students register with their name, email,
+     college branch, and semester.
+   - Profile settings are saved in MongoDB `User` model, which the AI models use
+     later to customize roadmaps, planners, and revision priorities.
+3. Interactive Workspace:
+   - Clicking a card in the dashboard routes the student to a specific feature page.
+   - Features load personal files, settings, and histories stored under the student's user ID.
+
+================================================================================
+5. LOCAL SETUP & TROUBLESHOOTING GUIDE
+================================================================================
+- Commands to start client/server concurrently from the root directory:
+  $env:PATH = "C:\Windows\System32;C:\Windows;" + $env:PATH; npm run dev
+- Client Port: http://localhost:5173/
+- Backend API Port: http://localhost:5005/
+- Local DB Fallback: If MongoDB Atlas connection fails, server automatically falls
+  back to 'mongodb://127.0.0.1:27017/edumind-ai' to keep all features fully functional.
+================================================================================

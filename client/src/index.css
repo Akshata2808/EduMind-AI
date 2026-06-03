@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-offwhite text-slate-900 font-sans antialiased selection:bg-palegreen selection:text-slate-950;
+  }
+  h1 {
+    @apply font-heading font-black tracking-[-0.03em] leading-[1.1] text-slate-950;
+  }
+  h2 {
+    @apply font-heading font-extrabold tracking-[-0.025em] leading-[1.2] text-slate-950;
+  }
+  h3 {
+    @apply font-heading font-bold tracking-[-0.015em] leading-snug text-slate-950;
+  }
+  h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight text-slate-950;
+  }
+  
+  /* Input focus states global overrides for premium look */
+  input, select, textarea {
+    @apply focus:ring-sage focus:border-sage;
+  }
+}
+
+@layer utilities {
+  /* Custom premium text gradients */
+  .text-gradient-green {
+    background: linear-gradient(135deg, #0f172a 0%, #2e4a38 60%, #4a6b54 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-mint {
+    background: linear-gradient(135deg, #2e4a38 0%, #61876c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* --- Premium 3D & Animation Utilities --- */
+
+@keyframes float3D {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float3D 6s ease-in-out infinite;
+}
+
+/* 3D Card Hover - lifts card up, shifts shadow depth, applies subtle perspective tilt */
+.card-3d {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(-1deg);
+  box-shadow: 
+    0 25px 50px -12px rgba(35, 56, 42, 0.12),
+    0 12px 24px -8px rgba(168, 195, 160, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+  border-color: rgba(168, 195, 160, 0.6);
+}
+
+/* 3D Dark Card Hover - lifts card up, shifts shadow depth, applies subtle perspective tilt with blue neon glow */
+.card-3d-dark {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d-dark:hover {
+  transform: translateY(-8px) rotateX(2deg) rotateY(-1deg);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 12px 24px -8px rgba(59, 130, 246, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+/* 3D Clickable Button (press down physics) */
+.btn-3d {
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 0 0 #8fa688, 0 8px 16px 0 rgba(35, 56, 42, 0.1);
+}
+
+.btn-3d:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 #8fa688, 0 2px 4px 0 rgba(35, 56, 42, 0.15);
+}
+
+/* Premium Glassmorphic Surface */
+.glass-premium {
+  background: rgba(242, 244, 239, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(168, 195, 160, 0.25);
+  box-shadow: 
+    0 8px 32px 0 rgba(35, 56, 42, 0.05),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 3D Card Flipping System */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Scrollbar styling overrides */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(168, 195, 160, 0.6);
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 195, 160, 0.6);
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
